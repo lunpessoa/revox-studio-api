@@ -33,5 +33,6 @@ namespace RevoxStudios.Domain.Databases
         public string instagram { get; set; }
         public string facebook { get; set; }
         public string telefoneEstab2 { get; set; }
+        public string estadoEstab { get; set; }
     }
 }

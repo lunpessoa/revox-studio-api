@@ -1,8 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "uPgUxjvA3JXG8ew5XKCltkqs/OVmEAZPe/aV51l7bAc2CRaJPlD8ZnvI045DTfk6iVPEiQIo2Z0CoBesxwqzuw==",
+  "dgSpecHash": "0JY8BitGGnhv+Dh888H4ipNaDQF9XGCwY0kYClFsMg98GZDRoDq/fw+wZrizpDssII26Ti7tck5RfUT5o5gBjg==",
   "success": true,
   "projectFilePath": "C:\\Users\\jenne\\source\\repos\\revox-studio-api\\RevoxStudios.Domain\\RevoxStudios.Domain.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\jenne\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
+    "C:\\Users\\jenne\\.nuget\\packages\\microsoft.identitymodel.jsonwebtokens\\6.14.1\\microsoft.identitymodel.jsonwebtokens.6.14.1.nupkg.sha512",
+    "C:\\Users\\jenne\\.nuget\\packages\\microsoft.identitymodel.logging\\6.14.1\\microsoft.identitymodel.logging.6.14.1.nupkg.sha512",
+    "C:\\Users\\jenne\\.nuget\\packages\\microsoft.identitymodel.tokens\\6.14.1\\microsoft.identitymodel.tokens.6.14.1.nupkg.sha512",
+    "C:\\Users\\jenne\\.nuget\\packages\\system.identitymodel.tokens.jwt\\6.14.1\\system.identitymodel.tokens.jwt.6.14.1.nupkg.sha512",
+    "C:\\Users\\jenne\\.nuget\\packages\\system.security.cryptography.cng\\4.5.0\\system.security.cryptography.cng.4.5.0.nupkg.sha512"
+  ],
   "logs": []
 }

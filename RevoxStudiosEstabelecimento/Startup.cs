@@ -28,6 +28,10 @@ namespace RevoxStudios
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSession(options => {
+                options.IdleTimeout = TimeSpan.FromMinutes(10);
+            });
+
 
             //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
@@ -68,12 +72,12 @@ namespace RevoxStudios
 
             //app.UseAuthentication();
             //app.UseAuthorization();
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
-
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {

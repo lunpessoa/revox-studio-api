@@ -2,13 +2,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 //using RevoxStudios.Databases;
 using RevoxStudios.Domain.Databases;
 using RevoxStudios.Infra;
 using RevoxStudios.Models;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace RevoxStudiosEstabelecimento.Controllers
@@ -64,6 +68,8 @@ namespace RevoxStudiosEstabelecimento.Controllers
                         entidade.telefoneDono = dados.telefoneDono;
                         entidade.emailDono = dados.emailDono;
                         entidade.senhaEstab = dados.senhaEstab;
+                        entidade.estadoEstab = dados.estadoEstab;
+
                         await _conexao.Estabelecimentos.AddAsync(entidade);
                         await _conexao.SaveChangesAsync();
 
@@ -93,6 +99,7 @@ namespace RevoxStudiosEstabelecimento.Controllers
             return mensagem;
         }
 
+        [Authorize]
         [HttpDelete("DeletarEstabelecimento")]
         public async Task<ActionResult<string>> DeletarEstabelecimento(int idEstab)
         {
@@ -122,6 +129,7 @@ namespace RevoxStudiosEstabelecimento.Controllers
             return mensagem;
         }
 
+        [Authorize]
         [HttpPut("EditarEstabelecimento")]
         public async Task<ActionResult<string>> EditarEstabelecimento(EstabelecimentoClasse dados)
         {
@@ -152,7 +160,7 @@ namespace RevoxStudiosEstabelecimento.Controllers
                     estabelecimento.cpfDono = dados.cpfDono;
                     estabelecimento.dtNascimento = dados.dtNascimento;
                     estabelecimento.telefoneDono = dados.telefoneDono;
-                    //estabelecimento.emailDono = dados.emailDono;
+                    estabelecimento.estadoEstab = dados.estadoEstab;
                     estabelecimento.senhaEstab = dados.senhaEstab;
                     estabelecimento.cnpjEstab = dados.cnpjEstab;
 
@@ -176,6 +184,7 @@ namespace RevoxStudiosEstabelecimento.Controllers
             return mensagem;
         }
 
+        [Authorize]
         [HttpGet("ListarEstabelecimento")]
         public async Task<ActionResult<List<Estabelecimentos>>> ListarEstabelecimento()
         {
@@ -184,6 +193,7 @@ namespace RevoxStudiosEstabelecimento.Controllers
             return lista;
         }
 
+        [Authorize]
         [HttpGet("ListarEstabelecimentoParametro")]
         public async Task<ActionResult<Estabelecimentos>> ListarEstabelecimentoParametro(int idEstab)
         {
@@ -192,6 +202,7 @@ namespace RevoxStudiosEstabelecimento.Controllers
             return estabelecimento;
         }
 
+        [Authorize]
         [HttpPost("CadastrarInfoExtraEstab")]
         public async Task<ActionResult<string>> CadastrarInfoExtraEstab([FromForm] EstabelecimentoClasse dados)
         {
@@ -241,16 +252,18 @@ namespace RevoxStudiosEstabelecimento.Controllers
             return mensagem;
         }
 
+        [Authorize]
         [HttpPost("CadastrarServiços")]
         public async Task<ActionResult<string>> CadastrarServiços(ServiçosClasse dados)
         {
             var mensagem = "";
             try
             {
+                var dadosEstabLogado = ValidarToken(HttpContext.Session.GetString("Account"));
                 var serviçoCadastrado = new Serviços();
 
-                serviçoCadastrado.idEstab = dados.idEstab;
-                serviçoCadastrado.nomeEstab = dados.nomeEstab;
+                serviçoCadastrado.idEstab = dadosEstabLogado.Id;
+                serviçoCadastrado.nomeEstab = dadosEstabLogado.Nome;
 
                 serviçoCadastrado.Serviço = dados.Serviço;
                 serviçoCadastrado.Preço = dados.Preço;
@@ -268,14 +281,16 @@ namespace RevoxStudiosEstabelecimento.Controllers
             return mensagem;
         }
 
+        [Authorize]
         [HttpGet("ListarServiços")]
-        public async Task<ActionResult<List<Serviços>>> ListarServiços()
+        public async Task<ActionResult<List<Serviços>>> ListarServiços(int idEstab)
         {
-            var lista = _conexao.Serviços.ToList();
+            var lista = _conexao.Serviços.Where(d=>d.idEstab == idEstab).ToList();
 
             return lista;
         }
 
+        [Authorize]
         [HttpGet("ListarServiçosParametro")]
         public async Task<ActionResult<Serviços>> ListarServiçosParametro(int idServiço)
         {
@@ -284,6 +299,7 @@ namespace RevoxStudiosEstabelecimento.Controllers
             return cliente;
         }
 
+        [Authorize]
         [HttpPut("EditarServiços")]
         public async Task<ActionResult<string>> EditarServiços(ServiçosClasse dados)
         {
@@ -310,6 +326,7 @@ namespace RevoxStudiosEstabelecimento.Controllers
             return mensagem;
         }
 
+        [Authorize]
         [HttpDelete("DeletarServiços")]
         public async Task<ActionResult<string>> DeletarServiços(int idServiço)
         {
@@ -339,6 +356,7 @@ namespace RevoxStudiosEstabelecimento.Controllers
             return mensagem;
         }
 
+        [Authorize]
         [HttpPost("CadastrarAgenda")]
         public async Task<ActionResult<string>> CadastrarAgenda(AgendaClasse dadosAgenda)
         {
@@ -374,6 +392,7 @@ namespace RevoxStudiosEstabelecimento.Controllers
             return mensagem;
         }
 
+        [Authorize]
         [HttpGet("ListarAgenda")]
         public async Task<ActionResult<List<Agenda>>> ListarAgenda()
         {
@@ -382,17 +401,19 @@ namespace RevoxStudiosEstabelecimento.Controllers
             return lista;
         }
 
+        [Authorize]
         [HttpGet("ListarAgendaParametro")]
         public async Task<ActionResult<Agenda>> ListarAgendaParametro(int idAgenda)
         {
-            var agenda = _conexao.Agenda.FirstOrDefault(d => d.idServiço.Equals(idAgenda));
+            var agenda = _conexao.Agenda.FirstOrDefault(d => d.idAgenda.Equals(idAgenda));
 
             return agenda;
         }
 
+        [Authorize]
         [HttpDelete("DeletarAgenda")]
         public async Task<ActionResult<BaseRetorno>> DeletarAgenda(int idAgenda)
-        {         
+        {
             var retorno = new BaseRetorno();
             var agendaDelete = new Agenda();
             try
@@ -420,6 +441,40 @@ namespace RevoxStudiosEstabelecimento.Controllers
             }
 
             return retorno;
+        }
+      
+        private DadosToken ValidarToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes("[SECRET USED TO SIGN AND VERIFY JWT TOKENS, IT CAN BE ANY STRING]");
+            try
+            {
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+
+                var jwtToken = (JwtSecurityToken)validatedToken;
+                var retorno = new DadosToken();
+                retorno.Id = int.Parse(jwtToken.Claims.First(x => x.Type == "Id").Value);
+                retorno.Email = jwtToken.Claims.First(x => x.Type == "Email").Value.ToString();
+                retorno.Cpf_Cnpj = jwtToken.Claims.First(x => x.Type == "Cpf_Cnpj").Value.ToString();
+                retorno.IdStatus = int.Parse(jwtToken.Claims.First(x => x.Type == "idStatus").Value);
+                retorno.Nome = jwtToken.Claims.First(x => x.Type == "Nome").Value.ToString();
+                // return account id from JWT token if validation successful
+                return retorno;
+            }
+            catch
+            {
+                // return null if validation fails
+                return null;
+            }
+
         }
 
     }
